@@ -26,9 +26,14 @@ class Tab extends React.Component {
 
     static propTypes = {
         title: PropTypes.string.isRequired,
-        changeTab: PropTypes.func.isRequired,
+        changeTab: PropTypes.func,
         isActive: PropTypes.bool.isRequired,
         index: PropTypes.number.isRequired
+    };
+
+    static defaultProps = {
+        isActive: false,
+        index: 0
     };
 
     render() {
@@ -37,7 +42,7 @@ class Tab extends React.Component {
 
         return (
             <div className={c} onClick={changeTab.bind(this, index)}>
-                <Translate content={title} />
+                {title.indexOf(".") > 0 ? <Translate content={title} /> : title}
             </div>
         );
     }
@@ -47,11 +52,13 @@ class Tab extends React.Component {
 class Tabs extends React.Component {
 
     static propTypes = {
-        setting: PropTypes.string
+        setting: PropTypes.string,
+        defaultActiveTab: PropTypes.number
     };
 
     static defaultProps = {
-        active: 0
+        active: 0,
+        defaultActiveTab: 0
     };
 
     static getStores() {
@@ -65,7 +72,7 @@ class Tabs extends React.Component {
     constructor(props) {
         super();
         this.state = {
-            activeTab: props.setting ? props.viewSettings.get(props.setting) || 0 : 0
+            activeTab: props.setting ? props.viewSettings.get(props.setting, props.defaultActiveTab) : props.defaultActiveTab
         };
     }
 
@@ -81,18 +88,33 @@ class Tabs extends React.Component {
 
     render() {
         let {children, contentClass, tabsClass, style} = this.props;
+
         let activeContent = null;
 
+        let tabIndex = [];
         let tabs = React.Children.map(children, (child, index) => {
+            if (!child) {
+                return null;
+            }
             let isActive = index === this.state.activeTab;
             if (isActive) {
                 activeContent = child.props.children;
             }
-            return React.cloneElement(child,{isActive: isActive, changeTab: this._changeTab.bind(this), index: index} )
+
+            return React.cloneElement(child, {isActive: isActive, changeTab: this._changeTab.bind(this), index: index} )
+        }).filter(a => {
+            if (a) {
+                tabIndex.push(a.props.index);
+            }
+            return a !== null;
         });
 
+        if (!activeContent) {
+            activeContent = tabs[0].props.children;
+        }
+
         return (
-            <div>
+            <div className={this.props.className}>
                 <div style={style} className={cnames("tabs", tabsClass)}>
                     {tabs}
                 </div>

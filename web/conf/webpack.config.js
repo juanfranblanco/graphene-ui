@@ -64,15 +64,16 @@ module.exports = function(options) {
         output: {
             path: outputPath,
             filename: "app.js",
-            pathinfo: true
+            pathinfo: !options.prod,
+            sourceMapFilename: "[name].js.map"
         },
-        devtool: options.prod ? "#inline-source-map" : "eval",
+        devtool: options.prod ? "source-map" : "eval",
         debug: options.prod ? false : true,
         module: {
             loaders: [
                 { 
                     test: /\.jsx$/,
-                    include: [path.join(root_dir, "app"), path.join(root_dir, "node_modules/react-foundation-apps")],
+                    include: [path.join(root_dir, "app"), path.join(root_dir, "node_modules/react-foundation-apps"), "/home/sigve/Dev/graphene/react-foundation-apps"],
                     loaders: options.prod ? ["babel-loader"] : ["babel-loader?cacheDirectory"]
                 },
                 { 
@@ -114,7 +115,7 @@ module.exports = function(options) {
     };
 
     if(options.prod) config.entry.vendors = [
-        "react", "classnames", "react-router", "counterpart", "react-translate-component",
+        "react", "react-dom", "classnames", "react-router", "react-highcharts/bundle/highstock", "counterpart", "react-translate-component",
         "perfect-scrollbar", "jdenticon", "react-notification-system", "react-tooltip",
         "whatwg-fetch", "alt", "react-json-inspector",
         "immutable", "lzma", "bytebuffer", "lodash"

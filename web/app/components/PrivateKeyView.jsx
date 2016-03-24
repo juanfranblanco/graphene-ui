@@ -1,4 +1,5 @@
 import React, {Component} from "react"
+import ReactDOM from "react-dom";
 import Modal from "react-foundation-apps/src/modal"
 import ZfApi from "react-foundation-apps/src/utils/foundation-api"
 import WalletUnlockActions from "actions/WalletUnlockActions"
@@ -25,7 +26,7 @@ export default class PrivateKeyView extends Component {
     
     componentDidMount() {
         var modalId = "key_view_modal" + this.props.pubkey
-        let modal = React.findDOMNode(this.refs[modalId])
+        let modal = ReactDOM.findDOMNode(this.refs[modalId])
         ZfApi.subscribe(modalId, (name, msg) => {
             if(name !== modalId) return
             if(msg === "close") this.reset()
@@ -35,6 +36,7 @@ export default class PrivateKeyView extends Component {
     render() {
         var modalId = "key_view_modal" + this.props.pubkey
         var keys = PrivateKeyStore.getState().keys
+
         var has_private = keys.has(this.props.pubkey)
         if( ! has_private) return <span>{this.props.children}</span>
         var key = keys.get(this.props.pubkey)

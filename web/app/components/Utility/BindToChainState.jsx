@@ -57,10 +57,6 @@ function BindToChainState(options) {
 
         return class Wrapper extends React.Component {
 
-            static contextTypes = {
-                router: React.PropTypes.func.isRequired
-            }
-
             constructor(props) {
                 super(props);
                 let prop_types_array = _.pairs(Component.propTypes);
@@ -269,7 +265,6 @@ function BindToChainState(options) {
                         }
                         let index = 0;
                         prop.forEach( obj_id => {
-                            ++index;
                             //console.log("-- Wrapper.chain_accounts_list item -->", obj_id, index);
                             if(obj_id) {
                                 let new_obj = ChainStore.getAccount(obj_id);
@@ -281,6 +276,7 @@ function BindToChainState(options) {
                                     prop_new_state[index] = prop_prev_state[index];
                                 }
                             }
+                            ++index;
                             ++all_objects_counter;
                         });
                         //console.log("-- Wrapper.chain_accounts_list: ", prop_new_state);

@@ -7,7 +7,7 @@
         de: "Deutsch",
         es: "Español",
         tr: "Türkçe"
-        
+
     },
     header: {
         title: "Graphene - Interfaz de Usiario",
@@ -15,7 +15,7 @@
         dashboard: "Tablero",
         explorer: "Explorer",
         exchange: "Exchange",
-        payments: "Transferir", 
+        payments: "Transferir",
         logout: "Salir",
         settings: "Configuración",
         current: "Cuenta Actual",
@@ -26,9 +26,6 @@
         help: "Ayuda",
         locked_tip: "Billetera bloqueada. Click para desbloquear.",
         unlocked_tip: "Billetera desbloqueada. Click para bloquear"
-    },
-    operation: {
-        pending: "%(blocks)s bloques pendientes"
     },
     account: {
         welcome: "Bienvenido a Graphene",
@@ -80,6 +77,7 @@
         perm: {
             active: "Permisos Activos",
             owner: "Permisos de Propietario",
+            memo_key: "Memo key",
             publish: "Publicar Cambios",
             reset: "Resetear Cambios",
             add: "Agregar Permisos",
@@ -91,7 +89,13 @@
             cancel: "Cancelar",
             add_permission_label: "Ingrese nombre de cuenta/llave y su relevancia",
             account_name_or_key: "Nombre de cuenta o Llave",
-            memo_public_key: "Llave Pública Memo"
+            memo_public_key: "Llave Pública Memo",
+            warning1: "Active permissions weights total of %(weights_total)s should be equal or exceed threshold of %(threshold)s",
+            warning2: "Owner permissions weights total of %(weights_total)s should be equal or exceed threshold of %(threshold)s",
+            warning3: "Account is already in the list",
+            warning4: "Key is already in the list",
+            action: "Action",
+            acct_or_key:" Account/Key"
         },
         votes: {
             proxy: "Convertir en Apoderado de sus Votos a",
@@ -147,7 +151,8 @@
             not_found: "Account not found.",
             premium_name_faucet: "This is a premium name. Premium names are more expensive and can't be registered for free by faucet. Try to select another name containing at least one dash, number or no vowels.",
             premium_name_warning: "This is a premium name that is more expensive to register. Regular names have at least one dash, number or no vowels."
-        }
+        },
+        settle: "Settle"
     },
     pagination: {
         newer: "Más reciente",
@@ -179,6 +184,32 @@
         see: "VER MIS TRANSFERENCIAS",
         close: "Cerrar"
     },
+    operation: {
+        pending: "%(blocks)s bloques pendientes",
+        reg_account: "{registrar} registered the account {new_account}",
+        transfer: "{from} sent {amount} to {to}",
+        proposal_create: "{account} created a proposed transaction",
+        proposal_update: "{account} updated a proposed transaction",
+        proposal_delete: "{account} deleted a proposed transaction",
+        fill_order: "{account} bought {received} at {price}",
+        vesting_balance_withdraw: "{account} withdrew vesting balance of {amount}",
+        balance_claim: "{account} claimed a balance of {amount}",
+        publish_feed: "{account} published feed price of {price}",
+        set_proxy: "{account} set {proxy} as their voting proxy",
+        update_account: "{account} updated their account data",
+        limit_order_sell: "{account} placed an order to sell {amount} at {price}",
+        limit_order_buy: "{account} placed an order to buy {amount} at {price}",
+        call_order_update: "{account} changed {debtSymbol} debt by {debt} and collateral by {collateral}",
+        asset_reserve: "{account} reserved {amount}",
+        asset_issue: "{account} issued {amount} to {to}",
+        asset_create: "{account} created the asset {asset}",
+        asset_update: "{account} updated the asset {asset}",
+        lifetime_upgrade_account: "{account} was upgraded to lifetime member",
+        annual_upgrade_account: "{account} was upgraded to annual member",
+        unlisted_by: "{lister} unlisted the account {listee}",
+        whitelisted_by: "{lister} whitelisted the account {listee}",
+        blacklisted_by: "{lister} blacklisted the account {listee}"
+    },    
     transaction: {
         confirm: "Por favor confirme la transacción",
         broadcast_success: "La transacción ha sido transmitida",
@@ -397,13 +428,6 @@
                 title: "Permisos",
                 max_market_fee: "Comisión de mercado máxima",
                 max_supply: "Emisión máxima",
-                chargeMarketFee: "Cambiar comisión de mercado",
-                allowWhiteList: "Permitir lista blanca",
-                allowIssuerOverride: "Allow issuer override",
-                restrictTransfers: "Restringir transferencias",
-                allowForceSettle: "Permitir liquidación forzosa",
-                allowGlobalSettle: "Permitir liquidación global",
-                allowStealthTransfer: "Permitir transferencias secretas",
                 blacklist_authorities: "Blacklist authorities",
                 blacklist_markets: "Blacklist markets",
                 whitelist_authorities: "Whitelist authorities",
@@ -628,7 +652,7 @@
         scan_qr: "Scan QR",
         transwiser: {
             gateway: "Transwiser",
-            visit_weidian: "Visit WEIDIAN to deposit",
+            visit_weidian: "Click to deposit",
             deposit_title: "Deposit RMB to %(asset)s",
             withdraw_title: "Withdraw %(asset)s to RMB",
             alipay: "ALIPAY Account Name",

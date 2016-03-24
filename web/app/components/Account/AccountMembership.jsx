@@ -11,6 +11,9 @@ import AccountActions from "actions/AccountActions";
 import Icon from "../Icon/Icon";
 import TimeAgo from "../Utility/TimeAgo";
 import HelpContent from "../Utility/HelpContent";
+import utils from "common/utils";
+import WalletActions from "actions/WalletActions";
+import {VestingBalance} from "./AccountVesting";
 
 @BindToChainState({keep_updating:true})
 class AccountMembership extends React.Component {
@@ -30,8 +33,16 @@ class AccountMembership extends React.Component {
         AccountActions.upgradeAccount(id, lifetime);
     }
 
+    _onClaim(e) {
+        e.preventDefault();
+        let cvb = ChainStore.getObject( this.props.account.get("cashback_vb") );
+        
+        WalletActions.claimVestingBalance(this.props.account.get("id"), cvb);
+    }
 
     render() {
+
+        console.log("location", window.location.origin);
         let gprops = this.props.gprops;
         let dprops = this.props.dprops;
 
@@ -43,15 +54,13 @@ class AccountMembership extends React.Component {
         if( ref ) account.referrer_name = ref.get('name');
         let reg = ChainStore.getAccount( account.registrar );
         if( reg ) account.registrar_name = reg.get('name');
-
-        let cvb = account.cashback_vb ? ChainStore.getObject( account.cashback_vb ) : null;
-
+       
         let account_name = account.name;
 
         let network_fee  = account.network_fee_percentage/100;
         let lifetime_fee = account.lifetime_referrer_fee_percentage/100;
         let referrer_total_fee = 100 - network_fee - lifetime_fee;
-        let referrer_fee  = referrer_total_fee * account.referrer_rewards_percentage/100;
+        let referrer_fee  = referrer_total_fee * account.referrer_rewards_percentage/10000;
         let registrar_fee = 100 - referrer_fee - lifetime_fee - network_fee;
 
         gprops = gprops.toJS();
@@ -74,7 +83,7 @@ class AccountMembership extends React.Component {
 
         return (
             <div className="grid-content" style={{overflowX: "hidden"}}>
-                <div className="content-block">
+                <div className="content-block no-margin">
                     <h3><Translate content={membership}/> {expiration}</h3>
                     { member_status=== "lifetime" ? null : (
                        <div>
@@ -83,66 +92,71 @@ class AccountMembership extends React.Component {
                                { member_status === "annual" ? null : (
                                   <HelpContent path="components/AccountMembership" section="annual" feesCashback={100 - network_fee - lifetime_fee} price={{amount: annual_cost, asset: core_asset}}/>
                                )}
-                               <a href className="button no-margin" onClick={this.upgradeAccount.bind(this, account.id, true)}>
+                               <div href className="button no-margin" onClick={this.upgradeAccount.bind(this, account.id, true)}>
                                    <Translate content="account.member.upgrade_lifetime"/>
-                               </a> &nbsp; &nbsp;
-                               {member_status === "annual" ? null :
-                               <a href className="button" onClick={this.upgradeAccount.bind(this, account.id, false)}>
+                               </div> &nbsp; &nbsp;
+                               {true || member_status === "annual" ? null :
+                               <div href className="button" onClick={this.upgradeAccount.bind(this, account.id, false)}>
                                    <Translate content="account.member.subscribe"/>
-                               </a>}
+                               </div>}
                             </div>
                        <br/><hr/>
                        </div>
                     )}
                 </div>
 
-                <div className="grid-block vertical large-horizontal">
-                    <div className="grid-block large-4">
-                        <div className="grid-content regular-padding">
+                <div className="content-block no-margin">
+                <div className="no-margin grid-block vertical large-horizontal">
+                    <div className="no-margin grid-block large-5">
+                        <div className="grid-content">
+                            {member_status=== "lifetime" ? (
+                            <div>
+                                <h4><Translate content="account.member.referral_link"/></h4>
+                                <Translate content="account.member.referral_text"/>:
+                                <h5>{`https://bitshares.openledger.info?r=${account.name}`}</h5>
+                            </div>) : null}
                             <h4><Translate content="account.member.fee_allocation"/></h4>
                             <table className="table key-value-table">
-                                <tr>
-                                    <td><Translate content="account.member.network_percentage"/></td>
-                                    <td>{network_fee}%</td>
-                                </tr>
-                                <tr>
-                                    <td><Translate content="account.member.lifetime_referrer"/>  &nbsp;
-                                    (<Link to="account" params={{account_name: account.lifetime_referrer}}>{account.lifetime_referrer_name}</Link>)
-                                    </td>
-                                    <td>{lifetime_fee}%</td>
-                                </tr>
-                                <tr>
-                                    <td><Translate content="account.member.registrar"/>  &nbsp;
-                                    (<Link to="account" params={{account_name: account.registrar_name}}>{account.registrar_name}</Link>)
-                                    </td>
-                                    <td>{registrar_fee}%</td>
-                                </tr>
-                                <tr>
-                                    <td><Translate content="account.member.referrer"/>  &nbsp;
-                                    (<Link to="account" params={{account_name: account.referrer}}>{account.referrer_name }</Link>)
-                                    </td>
-                                    <td>{referrer_fee}%</td>
-                                </tr>
-                                <tr>
-                                    <td><Translate content="account.member.membership_expiration"/> </td>
-                                    <td>{expiration_date}</td>
-                                </tr>
+                                <tbody>
+                                    <tr>
+                                        <td><Translate content="account.member.network_percentage"/></td>
+                                        <td>{network_fee}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><Translate content="account.member.lifetime_referrer"/>  &nbsp;
+                                        (<Link to={`account/${account.lifetime_referrer_name}/overview`}>{account.lifetime_referrer_name}</Link>)
+                                        </td>
+                                        <td>{lifetime_fee}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><Translate content="account.member.registrar"/>  &nbsp;
+                                        (<Link to={`account/${account.registrar_name}/overview`}>{account.registrar_name}</Link>)
+                                        </td>
+                                        <td>{registrar_fee}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><Translate content="account.member.referrer"/>  &nbsp;
+                                        (<Link to={`account/${account.referrer_name}/overview`}>{account.referrer_name }</Link>)
+                                        </td>
+                                        <td>{referrer_fee}%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><Translate content="account.member.membership_expiration"/> </td>
+                                        <td>{expiration_date}</td>
+                                    </tr>
+                                </tbody>
                             </table>
 
                             <h4 style={{paddingTop: "1rem"}}><Translate content="account.member.fees_cashback"/></h4>
-                            <table className="table key-value-table">                                
+                            <table className="table key-value-table">
                                 <Statistics stat_object={account.statistics}/>
-                                {cvb ? (
-                                    <tr>
-                                        <td><Translate content="account.member.cashback"/> </td>
-                                        <td><FormattedAsset amount={cvb.getIn(["balance", "amount"])} asset={cvb.getIn(["balance", "asset_id"])} /></td>
-                                    </tr>) : null}
                             </table>
+                            <br/>
+                            <VestingBalance vb={account.cashback_vb} account={account}/>                            
                         </div>
                     </div>
-                    <div className="grid-block large-1">&nbsp;</div>
                     <div className="grid-block large-7">
-                        <div className="grid-content regular-padding">
+                        <div className="grid-content">
                             <HelpContent path="components/AccountMembership"
                                          section="fee-division"
                                          account={account_name}
@@ -157,6 +171,7 @@ class AccountMembership extends React.Component {
                                          vestingPeriod={gprops.parameters.cashback_vesting_period_seconds/60/60/24}/>
                         </div>
                     </div>
+                </div>
                 </div>
             </div>
         );

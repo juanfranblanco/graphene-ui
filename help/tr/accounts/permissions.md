@@ -2,7 +2,7 @@
 
 BitShares'de , her hesap ikiye ayrılır 
 
-* **Etkin  İzin**: fonların yönetimi 
+* **Etkin  İzin**: fonların yönetimi ve
 * **Sahip İzni**: hesap yönetimi.
 
 Her ikisi de hesabınızın `İzinler` sekmesinde *yetkiler* ve *alt-sınır*'ın birlikte 
@@ -27,7 +27,7 @@ Aşağıda tanımlanmış etkin izinlerle yeni bir hesap oluşturulduğunu farz 
 Dikkatinizi çekeriz , aynı şema sahip izinleri için de 
 işe yarar. 
 
-## (Düz) Çoklu-İmza
+## (Düz) Çok-İmzalı
 
 Düz çok-imzalı bir şema, işlemin geçerli olabilmesi için aralarından 'N' sayıda kişinin 
 imzası gerekli  toplam 'M' sayıda kişiden oluşur. Şimdi biz, Bitshares'de, 'M' 
@@ -53,7 +53,7 @@ Dolayısıyla  işlemi geçerli kılmak için 4 kişiden sadece 2 sinin anlaşma
 Alternatif olarak, bir 4-ün-3'ü şeması oluşturmak için ya ağırlıkları 17% ye indirebiliriz 
 yada alt-sınırı 99%'a yükseltebiliriz. 
 
-## (Yassı) Esnek Çoklu-İmza
+## (Düz) Esnek Çok-İmzalı
 
 Alt-sınır ve ağırlıklar sayesinde fonlarımızla şimdi daha esneğiz, yada daha doğrusu 
 daha fazla *hakimiyetimiz* var. Mesela , farklı kişiler için ayrı ağırlıklar belirleyebiliriz.
@@ -77,9 +77,9 @@ imkanına sahip olur.
 
 Gelin beraber basit bir çok-basamaklı anonim hesap kurulumuna göz atalım. Mali İşler 
 Müdürü (MİM) ve onun için altında çalışan Vezne, Denetçi, Vergi Müdürü, Muhasebe vb. gibi 
-departmanları olan bir şirkete bakıyor olalım.  Bir de harcama ayrıcalıkları 
-olsun isteyen bir CEO'su olsun. 
-O zaman biz fonlar için yetkiyi şunlara göre oluştururuz :
+departmanları olan bir şirkete bakıyor olalım.  Bir de harcama ayrıcalıklarına sahip
+olmayı  isteyen bir CEO'su olsun. 
+O zaman biz fonlar için şunlara göre bir yetki oluştururuz :
 
 | Hesap | Ağırlık | 
 | ---------- | ------ | 

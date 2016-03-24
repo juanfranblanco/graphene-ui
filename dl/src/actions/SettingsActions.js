@@ -10,12 +10,8 @@ class SettingsActions {
         this.dispatch(value);
     }
 
-    addMarket(quote, base) {
-        this.dispatch({quote, base});
-    }
-
-    removeMarket(quote, base) {
-        this.dispatch({quote, base});
+    changeMarketDirection(value) {
+        this.dispatch(value);
     }
 
     addStarMarket(quote, base) {
@@ -26,6 +22,14 @@ class SettingsActions {
         this.dispatch({quote, base});
     }
 
+    addStarAccount(account) {
+        this.dispatch(account);
+    }
+
+    removeStarAccount(account) {
+        this.dispatch(account);
+    }
+
     addWS(ws) {
         this.dispatch(ws);
     }
@@ -33,6 +37,18 @@ class SettingsActions {
     removeWS(index) {
         this.dispatch(index);
     }
+
+    hideAsset(id, status) {
+
+        this.dispatch({id, status});
+    }
+
+    clearSettings() {
+        this.dispatch();
+    }
+    // changeBase(index, value) {
+    //     this.dispatch({index, value});
+    // }
 }
 
 module.exports = alt.createActions(SettingsActions);

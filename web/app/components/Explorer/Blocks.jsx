@@ -1,7 +1,7 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import {PropTypes} from "react";
 import {Link} from "react-router";
-import intlData from "../Utility/intlData";
 import BlockchainActions from "actions/BlockchainActions";
 import Translate from "react-translate-component";
 import {FormattedDate, FormattedRelative,FormattedTime} from "react-intl";
@@ -18,6 +18,7 @@ import TimeAgo from "../Utility/TimeAgo";
 import FormattedAsset from "../Utility/FormattedAsset";
 import Icon from "../Icon/Icon";
 import Ps from "perfect-scrollbar";
+import TransitionWrapper from "../Utility/TransitionWrapper";
 
 require("../Blockchain/json-inspector.scss");
 
@@ -54,16 +55,24 @@ class Blocks extends React.Component {
         globalObject: ChainTypes.ChainObject.isRequired,
         dynGlobalObject: ChainTypes.ChainObject.isRequired,
         coreAsset: ChainTypes.ChainAsset.isRequired
-    }
+    };
 
     static defaultProps = {
         globalObject: "2.0.0",
         dynGlobalObject: "2.1.0",
         coreAsset: "1.3.0"
-    }
+    };
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            animateEnter: false,
+            operationsHeight: null,
+            blocksHeight: null
+        };
+
+        this._updateHeight = this._updateHeight.bind(this);
     }
 
     _getBlock(height, maxBlock) {
@@ -73,10 +82,22 @@ class Blocks extends React.Component {
         }
     }
 
+    componentWillMount() {
+        window.addEventListener("resize", this._updateHeight, false);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this._updateHeight, false);
+    }
+
     componentWillReceiveProps(nextProps) {
 
         if (nextProps.latestBlocks.size === 0) {
             return this._getInitialBlocks();
+        } else if (!this.state.animateEnter) {
+            this.setState({
+                animateEnter: true
+            });
         }
 
         let maxBlock = nextProps.dynGlobalObject.get("head_block_number");
@@ -87,14 +108,22 @@ class Blocks extends React.Component {
 
     componentDidMount() {
         this._getInitialBlocks();
-        let oc = React.findDOMNode(this.refs.operations);
+        let oc = ReactDOM.findDOMNode(this.refs.operations);
         Ps.initialize(oc);
-        let blocks = React.findDOMNode(this.refs.blocks);
+        let blocks = ReactDOM.findDOMNode(this.refs.blocks);
         Ps.initialize(blocks);
+        this._updateHeight();
     }
 
-    shouldComponentUpdate(nextProps) {
-        return !Immutable.is(nextProps.latestBlocks, this.props.latestBlocks);
+    shouldComponentUpdate(nextProps, nextState) {
+        return (
+            !Immutable.is(nextProps.latestBlocks, this.props.latestBlocks) ||
+            !utils.are_equal_shallow(nextState, this.state)               
+        );
+    }
+
+    componentDidUpdate() {
+        this._updateHeight();
     }
 
     _getInitialBlocks() {
@@ -117,9 +146,29 @@ class Blocks extends React.Component {
         }
     }
 
+    _updateHeight() {
+            let containerHeight = this.refs.outerWrapper.offsetHeight;
+            let operationsTextHeight = this.refs.operationsText.offsetHeight;
+            let blocksTextHeight = this.refs.blocksText.offsetHeight;
+
+            this.setState({
+                operationsHeight: containerHeight - operationsTextHeight,
+                blocksHeight: containerHeight - blocksTextHeight
+            }, this.psUpdate);
+    }
+
+    psUpdate() {
+        let oc = ReactDOM.findDOMNode(this.refs.operations);
+        Ps.update(oc);
+        let blocks = ReactDOM.findDOMNode(this.refs.blocks);
+        Ps.update(blocks);
+    }
+
     render() {
 
         let {latestBlocks, latestTransactions, globalObject, dynGlobalObject, coreAsset} = this.props;
+        let {blocksHeight, operationsHeight} = this.state;
+
         let blocks = null, transactions = null;
         let headBlock = null;
         let trxCount = 0, blockCount = latestBlocks.size, trxPerSec = 0, blockTimes = [], avgTime = 0;
@@ -154,13 +203,11 @@ class Blocks extends React.Component {
             })
             .take(20)
             .map((block) => {
-
                 return (
                         <tr key={block.id}>
-                            <td><Link to="block" params={{height: block.id}}>#{utils.format_number(block.id, 0)}</Link></td>
+                            <td><Link to={`/block/${block.id}`}>#{utils.format_number(block.id, 0)}</Link></td>
                             <td><FormattedDate
                                 value={block.timestamp}
-                                formats={intlData.formats}
                                 format="time"
                             /></td>
                             <td><LinkToWitnessById witness={block.witness} /></td>
@@ -168,7 +215,9 @@ class Blocks extends React.Component {
                         </tr>
                     );
             }).toArray();
+
             let trxIndex = 0;
+            
             transactions = latestTransactions.take(20)
             .map((trx) => {
 
@@ -181,7 +230,7 @@ class Blocks extends React.Component {
                             result={trx.operation_results[opIndex++]}
                             block={trx.block_num}
                             hideFee={true}
-                            hideOpLabel={true}
+                            hideOpLabel={false}
                             current={"1.2.0"}
                         />
                     );
@@ -198,7 +247,7 @@ class Blocks extends React.Component {
         }
 
         return (
-            <div className="grid-block vertical page-layout">
+            <div ref="outerWrapper" className="grid-block vertical page-layout">
 
                 {/* First row of stats */}
                 <div className="align-center grid-block shrink small-horizontal blocks-row">
@@ -232,7 +281,7 @@ class Blocks extends React.Component {
                 </div>
 
                 {/* Second row of stats */ }
-                <div className="align-center grid-block shrink small-horizontal  blocks-row">
+                <div  className="align-center grid-block shrink small-horizontal  blocks-row">
                     <div className="grid-block text-center small-6 medium-3">
                         <div className="grid-content no-overflow clear-fix">
                             <span className="txtlabel subheader"><Translate component="span" content="explorer.blocks.active_witnesses" /></span>
@@ -309,40 +358,58 @@ class Blocks extends React.Component {
                 </div>
 
             {/* Fourth row: transactions and blocks */ }
-                <div className="grid-block no-overflow" style={{minHeight: "400px"}}>
-                    <div className="grid-block small-12 medium-6 vertical no-overflow">
-                        <div className="grid-content" ref="operations">
-                            <h3><Translate content="account.recent" /> </h3>
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th><Translate content="account.votes.info" /></th>
-                                        <th><Translate content="explorer.block.time" /></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {transactions}
-                                </tbody>
-                            </table>
+                <div ref ="transactionsBlock" className="grid-block no-overflow">
+                    
+                    <div className="grid-block small-12 medium-6 vertical no-overflow" style={{paddingBottom: 0}}>
+                        <div className="grid-block vertical no-overflow generic-bordered-box">
+                            <div ref="operationsText">
+                                <div className="block-content-header">
+                                    <Translate content="account.recent" />
+                                </div>
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th><Translate content="account.votes.info" /></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                            <div className="grid-block" style={{maxHeight: operationsHeight || "400px", overflow: "hidden", }} ref="operations">
+                                <table className="table">
+                                    <tbody>
+                                        {transactions}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <div className="grid-block medium-6 show-for-medium vertical no-overflow">
-                        <div className="grid-content" ref="blocks">
-                            <h3><Translate component="span" content="explorer.blocks.recent" /></h3>
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th><Translate component="span" content="explorer.block.id" /></th>
-                                        <th><Translate component="span" content="explorer.block.date" /></th>
-                                        <th><Translate component="span" content="explorer.block.witness" /></th>
-                                        <th><Translate component="span" content="explorer.block.count" /></th>
-                                    </tr>
-                                </thead>
+                    <div className="grid-block medium-6 show-for-medium vertical no-overflow" style={{paddingBottom: 0}}>
+                        <div className="grid-block vertical no-overflow generic-bordered-box">
+                                <div ref="blocksText">
+                                    <div className="block-content-header">
+                                        <Translate component="span" content="explorer.blocks.recent" />
+                                    </div>
+                                </div>
+                                <div className="grid-block vertical" style={{maxHeight: blocksHeight || "438px", overflow: "hidden", }} ref="blocks">
+                                
+                                <table className="table">
+                                    <thead>
+                                        <tr>
+                                            <th><Translate component="span" content="explorer.block.id" /></th>
+                                            <th><Translate component="span" content="explorer.block.date" /></th>
+                                            <th><Translate component="span" content="explorer.block.witness" /></th>
+                                            <th><Translate component="span" content="explorer.block.count" /></th>
+                                        </tr>
+                                    </thead>
 
-                                <tbody>
-                                    {blocks}
-                                </tbody>
-                            </table>
+                                    <TransitionWrapper
+                                        component="tbody"
+                                        transitionName="newrow"
+                                    >
+                                        {blocks}
+                                    </TransitionWrapper>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

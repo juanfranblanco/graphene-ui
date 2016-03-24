@@ -1,24 +1,11 @@
 import React from "react";
-import {Link} from "react-router";
 import Translate from "react-translate-component";
-import FormattedAsset from "../../Utility/FormattedAsset";
-import LoadingIndicator from "../../LoadingIndicator";
-import ChainStore from "api/ChainStore";
 import ChainTypes from "../../Utility/ChainTypes";
 import BindToChainState from "../../Utility/BindToChainState";
-import Statistics from "../Statistics";
-import AccountActions from "actions/AccountActions";
-import Icon from "../../Icon/Icon";
-import TimeAgo from "../../Utility/TimeAgo";
-import HelpContent from "../../Utility/HelpContent";
-import WalletDb from "stores/WalletDb";
-import AmountSelector from "../../Utility/AmountSelector";
-import WithdrawModal from "../../Modal/WithdrawModal";
 import Modal from "react-foundation-apps/src/modal";
 import Trigger from "react-foundation-apps/src/trigger";
 import ZfApi from "react-foundation-apps/src/utils/foundation-api";
 import AccountBalance from "../../Account/AccountBalance";
-import BalanceComponent from "../../Utility/BalanceComponent";
 import TranswiserDepositModal from "./TranswiserDepositModal";
 import TranswiserWithdrawModal from "./TranswiserWithdrawModal";
 
@@ -42,13 +29,13 @@ class TranswiserDepositWithdraw extends React.Component {
     }
 
     requestDepositUrl(){
+        let pair = this.depositCoin.toLocaleLowerCase() + ":" + this.props.receiveAsset.get('symbol').toLocaleLowerCase();
 
         fetch( this.apiUrl, {
             method:'get',
             headers: new Headers( { "Accept": "application/json", "Content-Type":"application/json" } )
         }).then( reply => { reply.json().then( json => {
                 // console.log( "reply: ", json )
-                let pair = this.depositCoin.toLocaleLowerCase() + ":" + this.props.receiveAsset.get('symbol').toLocaleLowerCase();
                 let setting = json[pair];
                 if( setting )
                     this.setState({
@@ -79,6 +66,7 @@ class TranswiserDepositWithdraw extends React.Component {
     }
 
     onWithdraw() {
+        // console.log('onWithdraw', this.getWithdrawModalId());
         ZfApi.publish(this.getWithdrawModalId(), "open");
     }
 
@@ -87,9 +75,13 @@ class TranswiserDepositWithdraw extends React.Component {
     }
 
     render() {
+        let loading = (<tr style={{display:"block"}}><td>loading</td><td></td><td></td><td></td></tr>);
+
+        if( !this.props.account || !this.props.issuerAccount || !this.props.receiveAsset )
+            return loading;
+
         if (!this.state.depositUrl) {
-            this.requestDepositUrl()
-            return <tr><td></td><td></td><td></td><td></td></tr>
+            this.requestDepositUrl(); return loading;
         }
 
         let withdrawModalId = this.getWithdrawModalId();
@@ -99,8 +91,6 @@ class TranswiserDepositWithdraw extends React.Component {
             <td>{this.props.receiveAsset.get('symbol')} </td>
             <td>
                 <button className={"button outline"} onClick={this.onDeposit.bind(this)}> <Translate content="gateway.deposit" /> </button>
-        {
-            //*
                 <Modal id={depositModalId} overlay={true}>
                     <Trigger close={depositModalId}>
                         <a href="#" className="close-button">&times;</a>
@@ -116,8 +106,6 @@ class TranswiserDepositWithdraw extends React.Component {
                             modalId={depositModalId} />
                     </div>
                 </Modal>
-            //*/
-                        }
             </td>
             <td> <AccountBalance account={this.props.account.get('name')} asset={this.props.receiveAsset.get('symbol')} /> </td>
             <td>

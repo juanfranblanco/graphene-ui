@@ -2,21 +2,32 @@ $bid-color: #50D2C2;
 $ask-color: #E3745B;
 $call-color: #BBBF2B;
 $light-panel-bg-color: #353742;
-$positive-color: #75D200;
+$positive-color: #6EC105;
 $negative-color: #E1424A;
 
 .market-layout {
   > .grid-block {
-    padding: 0.25rem 0.25rem 0.25rem 0.25rem !important;
+    // padding: 0.25rem 0.25rem 0.25rem 0.25rem !important;
   }
 
-/*  .left-column-2 {
-    min-width: 15rem;
+  >.left-column {
+    border-right: 1px solid grey;
+    border-top: none;
   }
 
   .right-column {
-    min-width: 15rem;
-  }*/
+    border-left: 1px solid grey;
+
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border-top: none;
+  }
+
+  .main-content {
+    .top-bar {
+      border-bottom: 1px solid grey;
+    }
+  }
 }
 
 .market-content {
@@ -31,54 +42,16 @@ $negative-color: #E1424A;
     padding: 0 0.625em 1.25em;
 }
 
-td.orderHistoryBid {
-  > span.price-integer, > span > span.price-integer {
-    font-weight: bold;
-    color: $bid-color;
-  }
-
-  > span.price-decimal, > span > span.price-decimal {
-    color: #e0e0e0;
-    opacity: 0.6;
-  }
-}
-
-td.orderHistoryAsk {
-  > span.price-integer, > span > span.price-integer {
-    font-weight: bold;
-    color: $ask-color;
-  }
-
-  > span.price-decimal, > span >span.price-decimal {
-    color: #e0e0e0;
-    opacity: 0.6;
-  }
-}
-
-td.orderHistoryCall {
-  > span.price-integer, > span > span.price-integer {
-    font-weight: bold;
-    color: $call-color;
-  }
-
-  > span.price-decimal, > span >span.price-decimal {
-    color: #e0e0e0;
-    opacity: 0.6;
-  }
-}
-
 .order-table {
 	width: 100%;
-	> caption {
-		padding-bottom: 1.25rem;
-	}
     > thead > tr > th {
-        font-size: 0.9rem;
+        font-size: 14px;
+        padding: 5px 5px;
     }
 
     > tbody > tr > td {
-        font-size: 0.75rem;
-        border: none;
+        font-size: 12px;
+        padding-bottom: 4px;
     }
 }
 
@@ -104,12 +77,12 @@ p.order-table-title {
 .backingWarning { color: yellow; }
 .backingError { color: red; }
 
-.buy-form {
+.bid-form {
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
 }
 
-.sell-form {
+.ask-form {
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
 }
@@ -119,13 +92,11 @@ p.order-table-title {
   min-width: 4rem;
 }
 
-.buy {
-  background-color: $bid-color !important;
+form.order-form {
+  padding: 10px;
 }
 
-.sell {
-  background-color: $ask-color !important;
-}
+
 
 #market-charts {
   > div > div.tabs {
@@ -147,8 +118,8 @@ p.order-table-title {
   table {
     width: 100%;
     th {
-      padding-top: 4px !important;
-      padding-bottom: 4px !important;
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
     }
   }
   > .table-container {
@@ -171,10 +142,11 @@ p.order-table-title {
   // }
 }
 
-.orderbook-latest-price {
-  border-bottom: 1px solid #777;
-  border-top: 1px solid #777;
+.final-row > td {
+  border-bottom: none !important;
 }
+
+
 
 .left-orderbook-header {
   width: 100%;
@@ -182,11 +154,9 @@ p.order-table-title {
 }
 
 .top-header {
-  border-bottom: 1px solid #777;
   padding-bottom: 0.25rem;
 }
 .bottom-header {
-  border-top: 1px solid #777;
   padding-top: 0.25rem;
 }
 
@@ -198,21 +168,11 @@ tr.top-header, tr.bottom-header, tr.spread-row {
 }
 
 .bid-total {
-  font-size: 90%;
-  position: absolute;
-  top: 5px;
-  left: 25px;
-  color: $bid-color;
-  z-index: 50;
+  color: $bid-color !important;  
 }
 
-.ask-total {
-  font-size: 90%;
-  position: absolute;
-  top: 5px;
-  right: 25px;
-  color: $ask-color;
-  z-index: 50;
+.ask-total { 
+  color: $ask-color !important;
 }
 
 .chart-label {
@@ -226,13 +186,12 @@ tr.top-header, tr.bottom-header, tr.spread-row {
 
 .buy-sell-info {
   font-size: 90%;
-  margin-bottom: 5px;
 }
 
 
 
 a.order-cancel {
-  font-size: 80%;
+  font-size: 90%;
   letter-spacing: 2px;
   padding-top: 0.01rem;
   padding-bottom: 0.01rem;
@@ -243,41 +202,71 @@ a.order-cancel {
   overflow: visible;
 }
 
-.market-stats > li {
-  display: inline-block;
-  padding-right: 0.5rem;
+li.stat.clickable:hover {
+  background-color: #4C4C4C;
+}
+
+.market-stats {
+  > li {
+    display: inline-block;
+    padding-right: 0.5rem;
+  }
 }
 
 .market-stats .stat {
   text-align: left;
-  font-size: 12px;
+  font-size: 0.75rem;
   overflow: hidden;
-  padding: 5px 0px;
 }
 
 .market-stats .stat .value {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #000;
   letter-spacing: normal;
 }
 
 .stats {
+  line-height: 1rem !important;
   list-style: none;
   overflow: hidden;
-  text-align: right;
   margin: 0px;
-  padding: 0px;
-  min-height: 63px;
+  padding: 0px; 
 }
+
+.top-stats li {
+  border-right: 1px solid grey;
+}
+
+.bottom-stats li {
+  border-right: 1px solid grey;
+}
+
 .stats .stat {
-  padding: 0 5px;
-  height: 100%;
+  padding: 3px 5px 0 5px;
+  vertical-align: top;
+  min-height: 27px;
+
+  > span {
+    > span:first-of-type {
+      padding-right: 5px;
+    }
+
+    > span:last-of-type {
+      padding-left: 5px;
+    }
+  }
 }
+
+.stats .indicators {
+  padding: 2px 0;
+  line-height: 1rem;
+  text-transform: uppercase;
+}
+
 .stats .stat:first-child {
   border-left: none;
 }
 .stats .stat .value {
-  font-size: 120%;
   color: #FFFFFF;
   letter-spacing: 1px;
 }
@@ -296,21 +285,28 @@ a.order-cancel {
 
 .market-symbol {
     font-weight: bold;
-    font-size: 110%;
-    padding-left: 1rem;
-    padding-right: 1.1rem;
-    padding-top: 1.3rem;
+    font-size: 1.1rem;
+    padding-left: 0.3rem;
+    padding-right: 0.5rem;
+    padding-top: 18px;
 }
 
 .active-bucket {
-  font-size: 0.75rem !important;
-  background-color: lighten($light-panel-bg-color, 12%);
+  background-color: lighten($light-panel-bg-color, 12%) !important;
   text-transform: uppercase;
 }
 
-.bucket-option {
+div.bucket-option {
   cursor: pointer;
   text-transform: none !important;
+  margin-right: 3px;
+  border-radius: 0;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.bucket-option:hover {
+  background-color: #4C4C4C;
 }
 
 .buy-sell-row {
@@ -350,6 +346,20 @@ a.order-cancel {
     font-size: 75%;
     padding: 0 0 0 5px;
     min-width: 5rem;
+    background-color: lighten($light-panel-bg-color, 12%);
+
+    > select {
+      padding: 0;
+      margin: 0;
+      height: 1.75rem;
+      line-height: 1.75rem;
+      background-color: lighten($light-panel-bg-color, 12%);
+      background: lighten($light-panel-bg-color, 12%) url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20version%3D%221.1%22%20width%3D%2232%22%20height%3D%2224%22%20viewBox%3D%220%200%2032%2024%22%3E%3Cpolygon%20points%3D%220%2C0%2032%2C0%2016%2C24%22%20style%3D%22fill%3A%20black%22%3E%3C/polygon%3E%3C/svg%3E") right 10px center no-repeat;
+      background-size: 8px 8px;
+      border: none;
+      color: white;
+      font-size: 12px;
+    }
 }
 
 .account-drop-down {
@@ -363,11 +373,17 @@ a.order-cancel {
 }
 
 .borrow-button {
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
+  margin-right: 0.2rem;
+  font-size: 0.8rem
 }
 
 .borrow-button-container {
-  padding-right: 1rem;
+  padding-left: 0.25rem;
+
+  > div:last-of-type {
+    margin-bottom: 0.2rem;
+  }
 }
 
 .order-change {
@@ -398,42 +414,51 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .middle-content {
-  margin-bottom: 1rem;
-}
-
-.header-sub-title {
-  font-size: 80%;
-  color: white;
+  margin-bottom: 10px;
 }
 
 .market-right-padding-only {
   padding: 0 0.6rem 0 0 !important;
 }
 
-.change-up {
-  color: $positive-color !important;
-}
-
-.change-down {
-  color: $negative-color !important;
-}
-
 .mymarkets-header {
   text-transform: uppercase;
   width: 50%;
-  text-align: center;
-  font-size: 1.10rem;
-  padding: 10px 0;
+  font-size: 1rem;
+  padding: 6px 10px;
   font-weight: 500;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  transition: border-color 0.3s ease 0s;
+  overflow:hidden;
 }
 
-.mymarkets-header.inactive {
-  background-color: #3F3F3F;
+.exchange-content-header {
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  overflow: hidden;
+}
+
+.mymarkets-base-select {
+  margin: 0;
+  padding: 0;
+  height: inherit;
+  font-size: inherit;
 }
 
 .mymarkets-list {
-  padding-top: 0.55rem;
+  padding: 0;
   font-size: 0.75rem;
+  .table > thead tr th {
+    font-size: 0.75rem;
+  }
+
+  .table > tbody tr td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
 }
 
 table thead tr th.mymarkets-header {
@@ -454,10 +479,33 @@ table thead tr th.mymarkets-header {
   fill: #878787;
 }
 
-.positive-change {
-  color: $positive-color;
+.no-data {
+  position: relative;
+  left: 45%;
+  top: 200px;
+  z-index: 999;
+  text-transform: uppercase;
+  font-size: 2rem;
 }
 
-.negative-change {
-  color: $negative-color;
+.market-right-padding {
+  padding-right: 15px !important;
 }
+
+.orderbook-showall {
+  text-align: center;
+  padding: 5px 0;
+  border-top: 1px solid #444;
+  font-size: 12px;
+}
+
+.newrow-enter.newrow-enter-active {
+  animation: flash 1.25s;
+  animation-timing-function: ease-out;
+}
+
+@keyframes flash {
+  0%   { background-color: #6B6B6B;}
+  100% { background-color: transparent;}
+}
+

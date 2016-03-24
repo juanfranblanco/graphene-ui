@@ -7,7 +7,7 @@ module.exports = {
         de: "Deutsch",
         es: "Español",
         tr: "Turkish"
-        
+
     },
     header: {
         title: "비트쉐어 2.0",
@@ -26,9 +26,6 @@ module.exports = {
         help: "도움말",
         locked_tip: "지갑이 잠겨있습니다. 잠금해제를 눌러주세요.",
         unlocked_tip: "지갑이 잠금해제 되어있습니다. 잠금을 눌러주세요."
-    },
-    operation : {
-        pending: "승인대기 중... %(blocks)s 블록"
     },
     account: {
         welcome: "비트쉐어 2.0 이용을 환영합니다",
@@ -80,6 +77,7 @@ module.exports = {
         perm: {
             active: "활성화된 사용권한",
             owner: "소유자 사용권한",
+            memo_key: "Memo key",
             publish: "변경사항 적용",
             reset: "변경사항 되돌리기",
             add: "사용권한 추가",
@@ -91,7 +89,13 @@ module.exports = {
             cancel: "취소",
             add_permission_label: "계정명/키 및 가중치를 입력하세요",
             account_name_or_key: "계정명 또는 키",
-            memo_public_key: "메모 공개키"
+            memo_public_key: "메모 공개키",
+            warning1: "Active permissions weights total of %(weights_total)s should be equal or exceed threshold of %(threshold)s",
+            warning2: "Owner permissions weights total of %(weights_total)s should be equal or exceed threshold of %(threshold)s",
+            warning3: "Account is already in the list",
+            warning4: "Key is already in the list",
+            action: "Action",
+            acct_or_key:" Account/Key"
         },
         votes: {
             proxy: "대리투표 계정",
@@ -110,7 +114,7 @@ module.exports = {
             add_committee_label: "위원",
             add_witness_label: "증인",
             approve_worker: "Approve worker proposal",
-            reject_worker: "Reject worker proposal"            
+            reject_worker: "Reject worker proposal"
         },
         options: {
             num_witnesses: "선호 증인 수",
@@ -147,7 +151,8 @@ module.exports = {
             not_found: "Account not found.",
             premium_name_faucet: "This is a premium name. Premium names are more expensive and can't be registered for free by faucet. Try to select another name containing at least one dash, number or no vowels.",
             premium_name_warning: "This is a premium name that is more expensive to register. Regular names have at least one dash, number or no vowels."
-        }
+        },
+        settle: "Settle"
     },
     pagination: {
         newer: "이전",
@@ -179,6 +184,33 @@ module.exports = {
         see: "내 전송내역 보기",
         close: "닫기"
     },
+    operation: {
+        pending: "승인대기 중... %(blocks)s 블록",
+        no_recent: "No recent transactions",
+        reg_account: "{registrar} registered the account {new_account}",
+        transfer: "{from} sent {amount} to {to}",
+        proposal_create: "{account} created a proposed transaction",
+        proposal_update: "{account} updated a proposed transaction",
+        proposal_delete: "{account} deleted a proposed transaction",
+        fill_order: "{account} bought {received} at {price}",
+        vesting_balance_withdraw: "{account} withdrew vesting balance of {amount}",
+        balance_claim: "{account} claimed a balance of {amount}",
+        publish_feed: "{account} published feed price of {price}",
+        set_proxy: "{account} set {proxy} as their voting proxy",
+        update_account: "{account} updated their account data",
+        limit_order_sell: "{account} placed an order to sell {amount} at {price}",
+        limit_order_buy: "{account} placed an order to buy {amount} at {price}",
+        call_order_update: "{account} changed {debtSymbol} debt by {debt} and collateral by {collateral}",
+        asset_reserve: "{account} reserved {amount}",
+        asset_issue: "{account} issued {amount} to {to}",
+        asset_create: "{account} created the asset {asset}",
+        asset_update: "{account} updated the asset {asset}",
+        lifetime_upgrade_account: "{account} was upgraded to lifetime member",
+        annual_upgrade_account: "{account} was upgraded to annual member",
+        unlisted_by: "{lister} unlisted the account {listee}",
+        whitelisted_by: "{lister} whitelisted the account {listee}",
+        blacklisted_by: "{lister} blacklisted the account {listee}"
+    },
     transaction: {
         confirm: "거래 확인",
         broadcast_success: "거래가 처리되었습니다",
@@ -199,8 +231,6 @@ module.exports = {
         coll_ratio: "초기 담보 비율",
         coll_maint: "담보 유지 비율",
         "create_key": "공개키 생성",
-        reg_account: "계정 등록",
-        was_reg_account: "계정이 등록됨. 등록자:",
         create_asset: "자산 생성",
         limit_order_sell: "주문번호 #%(num)s %(sell_amount)s 를 다음 가격에 매도 ",
         limit_order_buy: "주문번호 #%(num)s %(buy_amount)s 를 다음 가격에 매수 ",
@@ -399,13 +429,6 @@ module.exports = {
                 permissions: "사용권한",
                 max_market_fee: "최대 거래수수료",
                 max_supply: "최대 공급량",
-                chargeMarketFee: "거래수수료 변경",
-                allowWhiteList: "화이트리스트 사용",
-                allowIssuerOverride: "Allow issuer override",
-                restrictTransfers: "전송 제한",
-                allowForceSettle: "강제청산 사용",
-                allowGlobalSettle: "Allow global settle",
-                allowStealthTransfer: "익명전송 사용",
                 blacklist_authorities: "Blacklist authorities",
                 blacklist_markets: "Blacklist markets",
                 whitelist_authorities: "Whitelist authorities",
@@ -433,7 +456,7 @@ module.exports = {
             rank: "순위",
             last_confirmed: "마지막 승인블록",
             missed: "누락 블록수"
-            
+
         },
         committee_members: {
             title: "위원",
@@ -629,7 +652,7 @@ module.exports = {
         scan_qr: "Scan QR",
         transwiser: {
             gateway: "Transwiser",
-            visit_weidian: "Visit WEIDIAN to deposit",
+            visit_weidian: "Click to deposit",
             deposit_title: "Deposit RMB to %(asset)s",
             withdraw_title: "Withdraw %(asset)s to RMB",
             alipay: "ALIPAY Account Name",

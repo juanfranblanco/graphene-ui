@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from "react-dom";
 import cname from "classnames"
 import Trigger from "react-foundation-apps/src/trigger"
 import Modal from "react-foundation-apps/src/modal"
@@ -8,7 +9,7 @@ import notify from "actions/NotificationActions"
 import Translate from "react-translate-component";
 import counterpart from "counterpart";
 
-import AltContainer from "alt/AltContainer"
+import AltContainer from "alt-container";
 import WalletDb from "stores/WalletDb"
 import WalletUnlockStore from "stores/WalletUnlockStore"
 import WalletUnlockActions from "actions/WalletUnlockActions"
@@ -34,12 +35,12 @@ class WalletUnlockModal extends React.Component {
     }
 
     componentDidMount() {
-        let modal = React.findDOMNode(this.refs.modal)
+        let modal = ReactDOM.findDOMNode(this.refs.modal)
         ZfApi.subscribe(this.props.modalId, (name, msg) => {
             if(name !== this.props.modalId)
                 return
             if(msg === "close") {
-                if(this.props.reject) this.props.reject()
+                //if(this.props.reject) this.props.reject()
                 WalletUnlockActions.cancel()
             } else if (msg === "open") {
                 this.refs.password_input.clear()
@@ -105,7 +106,8 @@ class WalletUnlockModal extends React.Component {
                     <PasswordInput ref="password_input"
                         onEnter={this.onPasswordEnter}
                         key={this.state.password_input_reset}
-                        wrongPassword={this.state.password_error}/>
+                        wrongPassword={this.state.password_error}
+                        noValidation />
                     <div className="button-group">
                         <button className={"button"} onClick={this.onPasswordEnter}><Translate content="header.unlock" /> {unlock_what}</button>
                         <Trigger close={this.props.modalId}>

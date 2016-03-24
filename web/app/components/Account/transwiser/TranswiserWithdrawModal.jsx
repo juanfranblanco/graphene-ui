@@ -1,18 +1,11 @@
 import React from "react";
-import ZfApi from "react-foundation-apps/src/utils/foundation-api";
-import Modal from "react-foundation-apps/src/modal";
 import Trigger from "react-foundation-apps/src/trigger";
 import Translate from "react-translate-component";
 import ChainTypes from "../../Utility/ChainTypes";
 import ChainStore from "api/ChainStore";
 import BindToChainState from "../../Utility/BindToChainState";
-import FormattedAsset from "../../Utility/FormattedAsset";
 import utils from "common/utils";
-import classNames from "classnames";
 import BalanceComponent from "../../Utility/BalanceComponent";
-import WalletApi from "rpc_api/WalletApi";
-import WalletDb from "stores/WalletDb";
-import FormattedPrice from "../../Utility/FormattedPrice";
 import counterpart from "counterpart";
 import AmountSelector from "../../Utility/AmountSelector";
 import AccountActions from "actions/AccountActions";
@@ -41,8 +34,7 @@ class TranswiserWithdrawModal extends React.Component {
    }
 
    onWithdrawAmountChange( {amount, asset} ) {
-      // console.log("balanceAmount: " + this.balanceAmount);
-      if (!this.balanceAmount || this.balanceAmount == 0) {
+      if (!this.balanceAmount || this.balanceAmount == 0 || !amount || !asset) {
           this.setState( {
               withdraw_amount: 0,
               withdraw_amount_after_fee: 0,
@@ -144,7 +136,6 @@ class TranswiserWithdrawModal extends React.Component {
                  </div>
                </form>)
    }
-
 };
 
 export default TranswiserWithdrawModal

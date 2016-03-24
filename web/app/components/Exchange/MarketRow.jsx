@@ -1,11 +1,11 @@
 import React from "react";
+import {PropTypes} from "react-router";
 import FormattedAsset from "../Utility/FormattedAsset";
 import FormattedPrice from "../Utility/FormattedPrice";
 import Translate from "react-translate-component";
 import ChainTypes from "../Utility/ChainTypes";
 import BindToChainState from "../Utility/BindToChainState";
 import utils from "common/utils";
-import Link from "react-router";
 import Icon from "../Icon/Icon";
 import MarketsActions from "actions/MarketsActions";
 import SettingsActions from "actions/SettingsActions";
@@ -23,14 +23,26 @@ class MarketRow extends React.Component {
         tempComponent: "tr"        
     };
 
-    static contextTypes = {router: React.PropTypes.func.isRequired};
+    static contextTypes = {history: PropTypes.history};
+
+    constructor() {
+        super();
+
+        this.statsInterval = null;
+    }
 
     _onClick(marketID) {
-        this.context.router.transitionTo("exchange", {marketID: marketID});
+        this.context.history.pushState(null, `/market/${marketID}`);
     }
 
     componentDidMount() {
-        MarketsActions.getMarketStats(this.props.base, this.props.quote);
+        MarketsActions.getMarketStats.defer(this.props.base, this.props.quote);
+        this.statsChecked = new Date();
+        this.statsInterval = setInterval(MarketsActions.getMarketStats.bind(this, this.props.base, this.props.quote), 35 * 1000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.statsInterval);
     }
 
     shouldComponentUpdate(nextProps) {
@@ -50,7 +62,7 @@ class MarketRow extends React.Component {
 
     render() {
         let {quote, base, noSymbols, stats, starred} = this.props;
-        // let core = ChainStore.getAsset("1.3.0");
+
         if (!quote || !base) {
             return null;
         }
@@ -85,7 +97,7 @@ class MarketRow extends React.Component {
                     );
 
                 case "vol":
-                    let amount = stats ? stats.volumeQuote : 0;
+                    let amount = stats ? stats.volumeBase : 0;
                     return (
                         <td onClick={this._onClick.bind(this, marketID)} className="text-right" key={column.index}>
                             {utils.format_volume(amount)}
@@ -94,7 +106,7 @@ class MarketRow extends React.Component {
 
                 case "change":
                     let change = utils.format_number(stats && stats.change ? stats.change : 0, 2);
-                    let changeClass = change === "0.00" ? "" : change > 0 ? "positive-change" : "negative-change";
+                    let changeClass = change === "0.00" ? "" : change > 0 ? "change-up" : "change-down";
 
                     return (
                         <td onClick={this._onClick.bind(this, marketID)} className={"text-right " + changeClass} key={column.index}>
@@ -111,19 +123,19 @@ class MarketRow extends React.Component {
 
                 case "market":
                     return (<td onClick={this._onClick.bind(this, marketID)} key={column.index}>
-                            {marketName}
+                            {this.props.name}
                         </td>);
 
                 case "price":
                     let finalPrice = stats && stats.latestPrice ?
                         stats.latestPrice :
-                        stats && (stats.close.quote && stats.close.base) ?
-                        utils.get_asset_price(stats.close.quote, quote, stats.close.base, base, true) :
-                        utils.get_asset_price(price.baseAmount, base, price.quoteAmount, quote)
+                        stats && stats.close && (stats.close.quote.amount && stats.close.base.amount) ?
+                        utils.get_asset_price(stats.close.quote.amount, quote, stats.close.base.amount, base, true) :
+                        utils.get_asset_price(price.base.amount, base, price.quote.amount, quote)
 
                     return (
                         <td onClick={this._onClick.bind(this, marketID)} className="text-right" key={column.index}>
-                            {utils.format_number(finalPrice, 6)}
+                            {utils.format_number(finalPrice, finalPrice > 1000 ? 0 : finalPrice > 10 ? 2 : 6)}
                         </td>
                     )
 
@@ -162,8 +174,13 @@ class MarketRow extends React.Component {
             return a.key > b.key;
         });
 
+        let className = "clickable";
+        if (this.props.current) {
+            className += " activeMarket";
+        } 
+
         return (
-            <tr className="clickable" style={rowStyles}>{columns}</tr>
+            <tr className={className} style={rowStyles}>{columns}</tr>
         );
     }
 }

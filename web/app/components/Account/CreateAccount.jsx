@@ -23,13 +23,11 @@ class CreateAccount extends React.Component {
 
     static getStores() {
         return [AccountStore]
-    }
+    };
 
     static getPropsFromStores() {
         return {}
-    }
-
-    static contextTypes = {router: React.PropTypes.func.isRequired};
+    };
 
     constructor() {
         super();
@@ -43,6 +41,8 @@ class CreateAccount extends React.Component {
             show_identicon: false
         };
         this.onFinishConfirm = this.onFinishConfirm.bind(this);
+
+        this.accountNameInput = null;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -82,7 +82,7 @@ class CreateAccount extends React.Component {
             TransactionConfirmStore.unlisten(this.onFinishConfirm);
             TransactionConfirmStore.reset();
             if(op0[0] === 5 && op0[1].name === this.state.accountName) {
-                this.context.router.transitionTo("account-overview", {account_name: this.state.accountName});
+                this.props.history.pushState(null, `/account/${this.state.accountName}/overview`);
             }
         }
     }
@@ -96,7 +96,7 @@ class CreateAccount extends React.Component {
                     this.setState({loading: false});
                     TransactionConfirmStore.listen(this.onFinishConfirm);
                 } else {
-                    this.context.router.transitionTo("account-overview", {account_name: name});
+                    this.props.history.pushState(null, `/account/${name}/overview`);
                 }
             }).catch(error => {
                 console.log("ERROR AccountActions.createAccount", error);
@@ -131,7 +131,7 @@ class CreateAccount extends React.Component {
     onSubmit(e) {
         e.preventDefault();
         if (!this.isValid()) return;
-        let account_name = this.refs.account_name.value();
+        let account_name = this.accountNameInput.getValue();
         if (WalletDb.getWallet()) {
             this.createAccount(account_name);
         } else {
@@ -178,7 +178,7 @@ class CreateAccount extends React.Component {
         let my_accounts = AccountStore.getMyAccounts()
         let first_account = my_accounts.length === 0;
         let valid = this.isValid();
-        let buttonClass = classNames("button", {disabled: !valid});
+        let buttonClass = classNames("button no-margin", {disabled: !valid});
 
         let header_items = {
             icon: <div className="form-group">
@@ -208,7 +208,7 @@ class CreateAccount extends React.Component {
                     {Object.keys(config).map(key =>
                         {
                             let style = config[key];
-                            return <div style={{position: "absolute", left: 0, right: 0, ...style}}>
+                            return <div key={key} style={{position: "absolute", left: 0, right: 0, ...style}}>
                                 <div className="center-content">{header_items[key]}</div>
                             </div>;
                         })
@@ -226,7 +226,7 @@ class CreateAccount extends React.Component {
                     <div className="content-block center-content">
                         <div style={{width: '21em'}}>
                             <form onSubmit={this.onSubmit.bind(this)} noValidate>
-                                <AccountNameInput ref="account_name" cheapNameOnly={first_account}
+                                <AccountNameInput ref={(ref) => {if (ref) {this.accountNameInput = ref.refs.nameInput;}}} cheapNameOnly={first_account}
                                                   onChange={this.onAccountNameChange.bind(this)}
                                                   accountShouldNotExist={true}/>
 
@@ -248,11 +248,11 @@ class CreateAccount extends React.Component {
                                         <br/>
                                     </div>
                                 }
-                                {this.state.loading ?  <LoadingIndicator type="circle"/> :<button className={buttonClass}><Translate content="account.create_account" /></button>}
+                                {this.state.loading ?  <LoadingIndicator type="three-bounce"/> :<button className={buttonClass}><Translate content="account.create_account" /></button>}
                                 <br/>
                                 <br/>
-                                <label className="inline"><Link to="existing-account"><Translate content="account.existing_accounts" /></Link></label>
-                                {this.state.hide_refcode ? <span>&nbsp; &bull; &nbsp;
+                                <label className="inline"><Link to="/existing-account"><Translate content="account.existing_accounts" /></Link></label>
+                                {false && this.state.hide_refcode ? <span>&nbsp; &bull; &nbsp;
                                     <label className="inline"><a href onClick={this.showRefcodeInput.bind(this)}><Translate content="refcode.enter_refcode"/></a></label>
                                 </span> : null}
                             </form>

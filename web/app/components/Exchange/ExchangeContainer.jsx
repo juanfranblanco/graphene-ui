@@ -2,13 +2,21 @@ import React from "react";
 import MarketsStore from "stores/MarketsStore";
 import AccountStore from "stores/AccountStore";
 import SettingsStore from "stores/SettingsStore";
-import AltContainer from "alt/AltContainer";
+import AltContainer from "alt-container";
 import Exchange from "./Exchange";
 
 class ExchangeContainer extends React.Component {
 
+    // componentWillMount() {
+    //     let currentAccount = AccountStore.getState().currentAccount;
+
+    //     if (!currentAccount) {
+    //         this.props.history.pushState(null, "create-account");
+    //     }
+    // }
+
     render() {
-        let symbols = this.context.router.getCurrentParams().marketID.split("_");
+        let symbols = this.props.params.marketID.split("_");
 
         return (
                 <AltContainer 
@@ -80,6 +88,12 @@ class ExchangeContainer extends React.Component {
                     viewSettings: () => {
                         return SettingsStore.getState().viewSettings;
                     },
+                    settings: () => {
+                        return SettingsStore.getState().settings;
+                    },
+                    starredMarkets: () => {
+                        return SettingsStore.getState().starredMarkets;
+                    },
                     marketStats: () => {
                         return MarketsStore.getState().marketStats;
                     },
@@ -88,12 +102,10 @@ class ExchangeContainer extends React.Component {
                     }
                   }} 
                   >
-                    <Exchange quoteAsset={symbols[0]} baseAsset={symbols[1]} />
+                    <Exchange quoteAsset={symbols[0]} baseAsset={symbols[1]} {...this.props}/>
                 </AltContainer>
         );
     }
 }
-
-ExchangeContainer.contextTypes = { router: React.PropTypes.func.isRequired };
 
 export default ExchangeContainer;
